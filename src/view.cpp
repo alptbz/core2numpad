@@ -1,4 +1,4 @@
-#include "base.h"
+#include "view.h"
 
 uint32_t startTime, frame = 0; // For frames-per-second estimate
 TFT_eSPI tft = TFT_eSPI();
@@ -76,13 +76,76 @@ void init_display() {
   lv_indev_drv_register(&indev_drv);
 }
 
-lv_obj_t * label_hello_world;
+lv_obj_t * add_label(const char * text, lv_coord_t x_ofs, lv_coord_t y_ofs) {
+  lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);
+  lv_label_set_text(label, text);
+  lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+  lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND); 
 
-void add_hello_world_label() {
-  label_hello_world = lv_label_create(lv_scr_act(), NULL);
-  lv_label_set_text(label_hello_world, "Hello World!");
-  lv_label_set_align(label_hello_world, LV_LABEL_ALIGN_CENTER);
-  lv_label_set_long_mode(label_hello_world, LV_LABEL_LONG_EXPAND); 
-  
-  lv_obj_align(label_hello_world, NULL, LV_ALIGN_IN_TOP_MID, -10, 10);
+  lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_LEFT, x_ofs, y_ofs);
+
+  return label;
 }
+
+
+// https://docs.lvgl.io/7.11/widgets/btn.html#overview
+lv_obj_t * add_button(const char * text, lv_event_cb_t event_cb, lv_coord_t x_ofs, lv_coord_t y_ofs, lv_coord_t w, lv_coord_t h) {
+    lv_obj_t * label;
+
+    lv_obj_t * btn1 = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_set_event_cb(btn1, event_cb);
+
+    lv_obj_align(btn1, NULL, LV_ALIGN_IN_TOP_LEFT, x_ofs, y_ofs);
+    lv_obj_set_width(btn1, w);
+    lv_obj_set_height(btn1, h);
+
+    label = lv_label_create(btn1, NULL);
+    lv_label_set_text(label, text);
+
+    return btn1;
+}
+
+
+lv_obj_t * show_message_box(const char * text, const char * ok_button_text, const char * no_button_text, lv_event_cb_t event)
+{
+    static const char * btns[] ={ok_button_text, no_button_text, ""};
+
+    lv_obj_t * mbox1 = lv_msgbox_create(lv_scr_act(), NULL);
+    lv_msgbox_set_text(mbox1, text);
+    lv_msgbox_add_btns(mbox1, btns);
+    lv_obj_set_width(mbox1, 200);
+    lv_obj_set_event_cb(mbox1, event);
+    lv_obj_align(mbox1, NULL, LV_ALIGN_CENTER, 0, 0); 
+
+    return mbox1;
+}
+
+void close_message_box(lv_obj_t * msgbox) {
+  lv_msgbox_start_auto_close(msgbox, 10);
+}
+
+
+lv_obj_t * show_message_box_no_buttons(const char * text)
+{
+    lv_obj_t * mbox1 = lv_msgbox_create(lv_scr_act(), NULL);
+    lv_msgbox_set_text(mbox1, text);
+    lv_obj_set_width(mbox1, 200);
+    lv_obj_align(mbox1, NULL, LV_ALIGN_CENTER, 0, 0); 
+
+    return mbox1;
+}
+
+// https://docs.lvgl.io/7.11/widgets/led.html
+lv_obj_t * add_led(lv_coord_t x_ofs, lv_coord_t y_ofs, lv_coord_t w, lv_coord_t h)
+{
+  lv_obj_t * led1  = lv_led_create(lv_scr_act(), NULL);
+  lv_obj_align(led1, NULL, LV_ALIGN_IN_TOP_LEFT, x_ofs, y_ofs);
+  lv_obj_set_width(led1, w);
+  lv_obj_set_height(led1, h);
+  lv_led_off(led1);
+
+  
+
+  return led1;
+}
+
